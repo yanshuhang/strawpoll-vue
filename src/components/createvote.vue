@@ -1,12 +1,6 @@
 <template>
   <div>
-    <div style="margin: 20px">
-      <h1 style="display:inline">straw poll</h1>
-      <div class="router-link">
-        <router-link to="/login">登陆</router-link>
-        <router-link to="/register">注册</router-link>
-      </div>
-    </div>
+    <headele></headele>
     <el-card class="box-card">
       <br>
       <input type="text" v-model="title" placeholder="输入标题" class="nobordertitle">
@@ -34,9 +28,13 @@
 </template>
 <script>
 import axios from "axios";
+import headele from './headele'
 
 export default {
   name: "createvote",
+  components: {
+    headele
+  },
   data() {
     return {
       id: 0,
@@ -61,8 +59,14 @@ export default {
       let data = {
         title: "",
         optionList: "",
-        limit: this.limit
+        limit: this.limit,
+        userId: null,
       };
+      let userInfo = window.localStorage.getItem("userInfo")
+      if (userInfo !== null) {
+        data.userId = JSON.parse(userInfo).userId
+      }
+
       data.title = this.title.trim();
       
       for (const option of this.lists) {
@@ -70,7 +74,7 @@ export default {
       }
       data.optionList = this.lists.filter(item => item.title.trim() != "");
       if (data.title !== '' && data.optionList.length > 1 && data.optionList.length > this.limit) {
-        axios.post("http://134.175.120.217:8081/poll/create", data).then(res => {
+        axios.post("http://127.0.0.1:8081/poll/create", data,{headers:{Authorization: window.localStorage.getItem("token")}}).then(res => {
         this.id = res.data;
         this.$router.push("/" + this.id);
       });

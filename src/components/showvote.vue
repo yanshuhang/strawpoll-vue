@@ -1,15 +1,6 @@
 <template>
   <div id="app">
-    <div style="margin: 20px">
-      <h1 style="display:inline">straw poll</h1>
-      <div class="router-link">
-        <router-link to="/login">登陆</router-link>
-        <router-link to="/register">注册</router-link>
-      </div>
-    </div>
-    <!-- <br>
-    <br>
-    <br>-->
+    <headele></headele>
     <el-card class="box-card">
       <p
         style="font-size: 40px; font-family: 微软雅黑;text-align: left; margin-left: 10%; width: 80%"
@@ -23,7 +14,7 @@
           v-else
           style="font-family: 微软雅黑; text-align: left; margin-left: 10%; color:red; width: 130px ;float: left"
         >最多可选择{{vote.limit}}项</p>
-        <p style="font-family: 微软雅黑; text-align: left; width:120px;float: left">已有{{vote.count}}人投票</p>
+        <p style="font-family: 微软雅黑; text-align: left; width:120px;float: left">共有{{vote.count}}人投票</p>
       </div>
       <br>
       <br>
@@ -47,13 +38,14 @@
 </template>
 <script>
 import voteoption from "./voteoption";
+import headele from "./headele"
 import axios from "axios";
 
 export default {
   name: "showvote",
   props: ["id"],
   components: {
-    voteoption
+    voteoption, headele
   },
   data() {
     return {
@@ -109,18 +101,20 @@ export default {
       } else {
         // 构造传回后端的数据：对象数组，包含userId、userIp、选中的optionId
       let data = [];
-      data.pollId = Number.parseInt(this.id);
+      // data.pollId = Number.parseInt(this.id);
+      let userInfo = window.localStorage.getItem("userInfo")
+      
       for (const id of this.selectid) {
         // let pollId = Number.parseInt(this.id);
         // let optionId = Number.parseInt(id);
         let next = {
           pollId: Number.parseInt(this.id),
           optionId: Number.parseInt(id),
-          userId: null
-        };
+          userId: userInfo === null ? 0 : JSON.parse(userInfo).userId
+        };   
         data.push(next);
       }
-      axios.post("http://134.175.120.217:8081/poll/voting", data).then(res => {
+      axios.post("http://127.0.0.1:8081/poll/voting", data,{headers:{Authorization: window.localStorage.getItem("token")}}).then(res => {
         this.initProps(res);
       });
       }
@@ -143,7 +137,6 @@ export default {
             this.optionHaveVoted.push(true);
           }
         }
-        console.log(this.disabled);
       }
       if (this.vote.limit > 1) {
         this.type = "checkbox";
@@ -151,7 +144,7 @@ export default {
     }
   },
   created() {
-    axios.get("http://134.175.120.217:8081/poll/get/" + this.id).then(res => {
+    axios.get("http://127.0.0.1:8081/poll/get/" + this.id, {headers:{Authorization: window.localStorage.getItem("token")}}).then(res => {
       this.initProps(res);
     });
   }
@@ -165,10 +158,6 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
-}
-.router-link {
-  margin-left: 100px;
-  display: inline;
 }
 h1 {
   font-size: 80px;

@@ -8,6 +8,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import login from './components/login'
 import register from './components/register'
 import showvote from './components/showvote'
+import userhome from './components/userHome'
 
 Vue.use(VueRouter)
 Vue.use(ElementUI)
@@ -16,6 +17,7 @@ const routes = [
   {path: '/', component: App},
   {path: '/login', component: login},
   {path: '/register', component: register},
+  {path: '/userhome', component: userhome},
   {path: '/:id', component: showvote, props: true}
 ]
 
